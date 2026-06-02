@@ -1,0 +1,50 @@
+/* ===== Team Config View ===== */
+#teamConfigView{max-width:1400px;margin:0 auto;padding:16px}
+.tc-header{background:var(--bg-card);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:3px solid var(--accent);border-radius:10px 10px 0 0;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.tc-header h1{font-size:22px;color:var(--text-main)}
+.tc-header h1 small{font-size:14px;color:var(--text-weak);font-weight:400}
+.tc-header button{min-width:100px}
+
+.section{margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.section-title{background:var(--bg-card);padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none;color:var(--text-main);border-bottom:1px solid var(--border)}
+.section-title:hover{background:var(--bg-card-hover)}
+.section-title .arrow{transition:transform .2s;font-size:12px;color:var(--text-weak)}
+.section-title.collapsed .arrow{transform:rotate(-90deg)}
+.section-body{padding:14px;background:var(--bg-page);display:none}
+.section-body.active{display:block}
+
+.tc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:1200px){.tc-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.tc-grid{grid-template-columns:1fr}}
+
+.tc-card{background:var(--bg-card);border-radius:8px;padding:14px;border:1px solid var(--border);position:relative}
+.tc-card.starter{border-color:var(--accent);box-shadow:0 0 8px rgba(201,149,46,.25)}
+.tc-card .star-btn{position:absolute;top:8px;right:8px;background:transparent;border:1px solid var(--text-weak);border-radius:50%;width:28px;height:28px;padding:0;cursor:pointer;font-size:14px;color:var(--text-weak);display:flex;align-items:center;justify-content:center;transition:.2s}
+.tc-card .star-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tc-card .star-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tc-card .card-label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:2px}
+.tc-card input,.tc-card select{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:#faf3e5;color:var(--text-main);font-size:13px;transition:border-color .2s}
+.tc-card input:focus,.tc-card select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}
+.tc-card .tc-name-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:6px}
+.tc-card .tc-name-row .name-wrap{flex:4;min-width:0}
+.tc-card .tc-name-row .hp-wrap{flex:1;min-width:0}
+.tc-card .tc-skills{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px}
+.tc-card .tc-skills input{font-size:12px;padding:3px 6px}
+.tc-card .tc-skill-info{font-size:10px;color:var(--text-weak);min-height:14px;padding-left:4px}
+
+.tc-enemy-mode{display:flex;align-items:center;gap:16px;padding:12px 16px;background:var(--bg-card);border-radius:6px;margin-bottom:12px;border:1px solid var(--border)}
+.tc-enemy-mode label{font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text-main)}
+.tc-enemy-mode input[type=radio]{cursor:pointer;width:16px;height:16px;accent-color:var(--accent)}
+
+.tc-footer{text-align:center;padding:20px 0}
+.tc-footer button{min-width:160px;padding:12px 24px;font-size:16px}
+
+/* ===== Team Analysis Section ===== */
+#tcTeamAnalysis{width:100%;min-height:180px;padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg-card);color:var(--text-main);font-size:13px;font-family:'Microsoft YaHei','PingFang SC',sans-serif;line-height:1.7;resize:vertical}
+#tcTeamAnalysis:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}
+.tc-analysis-footer{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.tc-analysis-footer .api-group{flex:3;min-width:200px;display:flex;gap:8px;align-items:flex-end}
+.tc-analysis-footer .api-group > div{flex:1;min-width:0}
+.tc-analysis-footer label{font-size:11px;color:var(--text-secondary);display:block;margin-bottom:2px}
+.tc-analysis-footer input,.tc-analysis-footer select{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);color:var(--text-main);font-size:13px}
+.tc-analysis-footer input:focus,.tc-analysis-footer select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}

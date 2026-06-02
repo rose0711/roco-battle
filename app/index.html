@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>洛克王国 · 对局模拟器</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/team-config.css">
+<link rel="stylesheet" href="css/battle-view.css">
+<link rel="stylesheet" href="css/type-badges.css">
+</head>
+<body>
+
+<!-- =================================================== -->
+<!-- ========== TEAM CONFIG VIEW ======================= -->
+<!-- =================================================== -->
+<div id="teamConfigView">
+
+<div class="tc-header">
+  <div>
+    <h1>⚡ 洛克王国 · 阵容配置 <small>配置好阵容后进入对战</small></h1>
+  </div>
+</div>
+
+<!-- 我方阵容 -->
+<div class="section">
+  <div class="section-title" onclick="toggleSection(this)">
+    <span class="arrow">▼</span> 🟦 我方阵容 (6只)
+    <span style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn btn-sm btn-success" onclick="event.stopPropagation();savePlayerTeam()" title="命名保存我方阵容到存档目录">💾 命名保存</button>
+      <button class="btn btn-sm btn-warning" onclick="event.stopPropagation();loadPlayerTeam()" title="从存档目录载入我方阵容">📂 载入存档</button>
+    </span>
+  </div>
+  <div class="section-body active">
+    <div style="display:flex;align-items:center;gap:8px;padding:0 0 10px 0">
+      <span style="font-size:13px;color:#7b6953;white-space:nowrap">阵容名:</span>
+      <input id="playerTeamName" value="我的阵容" style="flex:1;max-width:300px;padding:4px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px">
+      <span id="playerStarterDisplay" style="font-size:12px;color:#c9952e;white-space:nowrap"></span>
+    </div>
+    <div class="tc-grid" id="playerConfigGrid"></div>
+  </div>
+</div>
+
+<!-- 敌方模式 & 阵容 -->
+<div class="section">
+  <div class="section-title" onclick="toggleSection(this)">
+    <span class="arrow">▼</span> 🟥 敌方阵容
+    <span id="enemyTeamControls" style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn btn-sm btn-success" onclick="event.stopPropagation();saveEnemyTeam()" title="命名保存敌方阵容到存档目录">💾 命名保存</button>
+      <button class="btn btn-sm btn-warning" onclick="event.stopPropagation();loadEnemyTeam()" title="从存档目录载入敌方阵容">📂 载入存档</button>
+    </span>
+  </div>
+  <div class="section-body active">
+    <div id="enemyTeamNameRow" style="display:flex;align-items:center;gap:8px;padding:0 0 10px 0">
+      <span style="font-size:13px;color:#7b6953;white-space:nowrap">阵容名:</span>
+      <input id="enemyTeamName" value="敌方阵容" style="flex:1;max-width:300px;padding:4px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px">
+      <span id="enemyStarterDisplay" style="font-size:12px;color:#c9952e;white-space:nowrap"></span>
+    </div>
+    <div class="tc-enemy-mode">
+      <label><input type="radio" name="tcEnemyMode" value="known" checked onchange="toggleTcEnemyMode()"> 🎯 已知全部精灵</label>
+      <label><input type="radio" name="tcEnemyMode" value="unknown" onchange="toggleTcEnemyMode()"> ❓ 未知阵容</label>
+    </div>
+    <div id="tcEnemyGridWrapper">
+      <div class="tc-grid" id="enemyConfigGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 🤖 阵容分析 -->
+<div class="section">
+  <div class="section-title" onclick="toggleSection(this)">
+    <span class="arrow">▼</span> 🤖 阵容分析
+  </div>
+  <div class="section-body active">
+    <textarea id="tcTeamAnalysis" placeholder="可手动编写阵容分析，或点击下方 AI 按钮自动生成…"></textarea>
+    <div class="tc-analysis-footer">
+      <div class="api-group">
+        <div>
+          <label>API Key
+            <label style="font-size:11px;color:#7b6953;cursor:pointer;margin-left:4px;font-weight:400">
+              <input type="checkbox" id="tcAiRememberKey" style="width:13px;height:13px;cursor:pointer;vertical-align:middle">
+              <span style="vertical-align:middle">记住</span>
+            </label>
+          </label>
+          <input type="password" id="tcAiApiKey" placeholder="API Key">
+        </div>
+        <div style="flex:1">
+          <label>大模型</label>
+          <select id="tcAiProvider" style="width:100%" onchange="onProviderChange('tcAi')">
+            <option value="dashscope">DashScope</option>
+            <option value="deepseek">DeepSeek</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label>具体模型</label>
+          <select id="tcAiModel" style="width:100%"></select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="runTeamAnalysis()">🤖 AI 生成分析</button>
+      <button class="btn btn-sm btn-primary" onclick="testTeamAIConnection()">测试连接</button>
+      <span style="font-size:11px;color:#7b6953">💡 填写我方精灵后点击生成</span>
+    </div>
+  </div>
+</div>
+
+<div class="tc-footer">
+  <button class="btn btn-success" onclick="enterBattle()" style="min-width:200px;padding:14px 32px;font-size:18px">⚔️ 进入对战</button>
+</div>
+
+</div>
+
+<!-- =================================================== -->
+<!-- ========== BATTLE VIEW ============================ -->
+<!-- =================================================== -->
+<div id="battleView" style="display:none">
+
+<div class="header">
+  <div>
+    <h1>⚡ 洛克王国 · 对局模拟器 <small id="turnLabel">第 1 回合</small></h1>
+    <div style="font-size:12px;color:#7b6953;margin-top:4px">
+      <span id="battleIdLabel">对战 #1</span>
+    </div>
+  </div>
+  <div class="header-controls">
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 游戏状态 -->
+<div id="gameHpSection" class="section">
+  <div class="game-hp">
+    <div class="hp-side">
+      <span class="hp-label">我方</span>
+      <span class="hp-hearts" id="playerHearts">❤️❤️❤️❤️</span>
+      <input class="hp-input" id="playerHP" type="number" min="0" max="4" value="4" onchange="updateHPDisplay()">
+    </div>
+    <div class="hp-side">
+      <span class="hp-label">敌方</span>
+      <span class="hp-hearts" id="opponentHearts">❤️❤️❤️❤️</span>
+      <input class="hp-input" id="opponentHP" type="number" min="0" max="4" value="4" onchange="updateHPDisplay()">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:12px;color:#7b6953">回合:</span>
+      <span class="turn-badge" id="turnBadge">1</span>
+    </div>
+  </div>
+</div>
+
+<!-- 我方 & 敌方 并列 -->
+<div class="grid-2">
+
+  <!-- ===== 我方 ===== -->
+  <div>
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)">
+        <span class="arrow">▼</span> 🟦 我方出战精灵
+      </div>
+      <div class="section-body active" id="playerActiveSection">
+        <div class="pokemon-card" id="playerActiveCard">
+          <div class="card-header">
+            <div class="sprite-box" id="playerSpriteBox"><span class="no-img">🖼</span></div>
+            <div style="flex:1;min-width:0">
+              <div class="info-grid">
+                <div><label>名字</label><input list="spriteList" id="pName" readonly placeholder="输入精灵名..."><datalist id="spriteList"></datalist></div>
+                <div><label>类型</label><input id="pType" readonly placeholder="自动"></div>
+                <div><label>HP</label><div style="display:flex;gap:4px"><input id="pCurrHP" type="number" placeholder="当前" style="flex:1" readonly><span style="line-height:28px;color:#7b6953">/</span><input id="pMaxHP" type="number" placeholder="最大" style="flex:1" readonly></div></div>
+                <div><label>能量</label><div style="display:flex;gap:4px"><input id="pCurrEnergy" type="number" placeholder="当前" style="flex:1" readonly><span style="line-height:28px;color:#7b6953">/</span><input id="pMaxEnergy" type="number" placeholder="最大" style="flex:1" readonly></div></div>
+              </div>
+              <details class="card-details" style="margin-top:6px">
+                <summary style="font-size:12px;color:#b09e82;cursor:pointer;padding:2px 0;user-select:none">📋 特性 / 克制 / 抵抗 ▸</summary>
+                <div class="info-grid" style="margin-top:6px">
+                  <div><label>特性</label><input id="pAbility" readonly placeholder="自动"></div>
+                  <div><label>特性描述</label><input id="pAbilityDesc" readonly placeholder="自动"></div>
+                  <div><label>克制</label><input id="pStrong" readonly placeholder="自动"></div>
+                  <div><label>被克制</label><input id="pWeak" readonly placeholder="自动"></div>
+                  <div><label>抵抗</label><input id="pResists" readonly placeholder="自动"></div>
+                  <div><label>弱抗</label><input id="pResisted" readonly placeholder="自动"></div>
+                </div>
+              </details>
+            </div>
+          </div>
+          <label style="font-size:13px;font-weight:600;color:#c9952e;margin:8px 0 4px">技能 × 4</label>
+          <div class="skills-row">
+            <div class="skill-item" style="flex-direction:column;align-items:stretch">
+              <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="pSkill0Icon" src="" alt=""></div><input list="skillList" id="pSkill0" placeholder="技能1" readonly style="flex:1"></div>
+              <div id="pSkillInfo0" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+            </div>
+            <div class="skill-item" style="flex-direction:column;align-items:stretch">
+              <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="pSkill1Icon" src="" alt=""></div><input list="skillList" id="pSkill1" placeholder="技能2" readonly style="flex:1"></div>
+              <div id="pSkillInfo1" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+            </div>
+            <div class="skill-item" style="flex-direction:column;align-items:stretch">
+              <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="pSkill2Icon" src="" alt=""></div><input list="skillList" id="pSkill2" placeholder="技能3" readonly style="flex:1"></div>
+              <div id="pSkillInfo2" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+            </div>
+            <div class="skill-item" style="flex-direction:column;align-items:stretch">
+              <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="pSkill3Icon" src="" alt=""></div><input list="skillList" id="pSkill3" placeholder="技能4" readonly style="flex:1"></div>
+              <div id="pSkillInfo3" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+            </div>
+          </div>
+          <datalist id="skillList"></datalist>
+        </div>
+      </div>
+    </div>
+
+    <!-- 我方后备 -->
+    <div class="section">
+      <div class="section-title collapsed" onclick="toggleSection(this)"><span class="arrow">▼</span> 🟦 我方后备精灵 (5)</div>
+      <div class="section-body" id="playerReserveSection">
+        <div class="reserve-grid" id="playerReserveGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 敌方 ===== -->
+  <div>
+    <div class="section">
+      <div class="section-title" onclick="toggleSection(this)"><span class="arrow">▼</span> 🟥 敌方出战精灵</div>
+      <div class="section-body active" id="opponentActiveSection">
+        <div class="pokemon-card" id="opponentActiveCard">
+          <div class="card-header">
+            <div class="sprite-box" id="opponentSpriteBox"><span class="no-img">🖼</span></div>
+            <div style="flex:1;min-width:0">
+              <div class="info-grid">
+                <div><label>名字</label><input list="spriteList" id="oName" readonly placeholder="输入精灵名..."></div>
+                <div><label>类型</label><input id="oType" readonly placeholder="自动"></div>
+                <div><label>HP (%)</label><div style="display:flex;gap:4px"><input id="oCurrHP" type="number" placeholder="当前%" style="flex:1" value="100" readonly><span style="line-height:28px;color:#7b6953">/</span><input id="oMaxHP" type="number" placeholder="最大%" style="flex:1" value="100" readonly></div></div>
+                <div><label>能量</label><div style="display:flex;gap:4px"><input id="oCurrEnergy" type="number" placeholder="当前" style="flex:1" value="10" readonly><span style="line-height:28px;color:#7b6953">/</span><input id="oMaxEnergy" type="number" placeholder="最大" style="flex:1" value="10" readonly></div></div>
+              </div>
+              <details class="card-details" style="margin-top:6px">
+                <summary style="font-size:12px;color:#b09e82;cursor:pointer;padding:2px 0;user-select:none">📋 特性 / 克制 / 抵抗 ▸</summary>
+                <div class="info-grid" style="margin-top:6px">
+                  <div><label>特性</label><input id="oAbility" readonly placeholder="自动"></div>
+                  <div><label>特性描述</label><input id="oAbilityDesc" readonly placeholder="自动"></div>
+                  <div><label>克制</label><input id="oStrong" readonly placeholder="自动"></div>
+                  <div><label>被克制</label><input id="oWeak" readonly placeholder="自动"></div>
+                  <div><label>抵抗</label><input id="oResists" readonly placeholder="自动"></div>
+                  <div><label>弱抗</label><input id="oResisted" readonly placeholder="自动"></div>
+                </div>
+              </details>
+            </div>
+          </div>
+          <label style="font-size:13px;font-weight:600;color:#c9952e;margin:8px 0 4px">技能 × 4</label>
+<div class="skills-row">
+  <div class="skill-item" style="flex-direction:column;align-items:stretch">
+    <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="oSkill0Icon" src="" alt=""></div><input id="oSkill0" readonly placeholder="技能1" style="flex:1"></div>
+    <div id="oSkillInfo0" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+  </div>
+  <div class="skill-item" style="flex-direction:column;align-items:stretch">
+    <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="oSkill1Icon" src="" alt=""></div><input id="oSkill1" readonly placeholder="技能2" style="flex:1"></div>
+    <div id="oSkillInfo1" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+  </div>
+  <div class="skill-item" style="flex-direction:column;align-items:stretch">
+    <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="oSkill2Icon" src="" alt=""></div><input id="oSkill2" readonly placeholder="技能3" style="flex:1"></div>
+    <div id="oSkillInfo2" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+  </div>
+  <div class="skill-item" style="flex-direction:column;align-items:stretch">
+    <div style="display:flex;align-items:center;gap:6px;width:100%"><div class="skill-icon"><img id="oSkill3Icon" src="" alt=""></div><input id="oSkill3" readonly placeholder="技能4" style="flex:1"></div>
+    <div id="oSkillInfo3" style="font-size:11px;color:#7b6953;padding-left:30px;min-height:18px"></div>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 敌方后备 -->
+    <div class="section">
+      <div class="section-title collapsed" onclick="toggleSection(this)"><span class="arrow">▼</span> 🟥 敌方后备精灵</div>
+      <div class="section-body" id="opponentReserveSection">
+        <div id="opponentReserveInputArea">
+          <div class="opponent-unknown-option">
+            <input type="radio" name="opponentReserveMode" id="oReserveKnown" value="known" checked onchange="toggleOpponentReserveMode()">
+            <label for="oReserveKnown">已知全部 5 只（输入名字）</label>
+            &nbsp;
+            <input type="radio" name="opponentReserveMode" id="oReserveUnknown" value="unknown" onchange="toggleOpponentReserveMode()">
+            <label for="oReserveUnknown">未知（换宠时手动补）</label>
+          </div>
+          <div class="reserve-grid" id="opponentReserveGrid"></div>
+        </div>
+        <div id="opponentReserveDisplayArea" style="margin-top:6px;display:none">
+          <div style="font-size:13px;color:#c9952e;font-weight:600;margin-bottom:6px">📋 敌方后备一览</div>
+          <div class="reserve-grid" id="opponentReserveDisplayGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 行动 -->
+<div class="section">
+  <div class="section-title" onclick="toggleSection(this)"><span class="arrow">▼</span> ⚔️ 行动</div>
+  <div class="section-body active" id="actionSection">
+    <div class="action-row">
+      <div class="action-group">
+        <h4>🟦 我方行动</h4>
+        <label>行动类型</label>
+        <select id="pActionType" onchange="updatePlayerActionUI()">
+          <option value="use_skill">释放技能</option>
+          <option value="switch">更换精灵</option>
+          <option value="recharge">聚能</option>
+          <option value="wish_strike">愿力冲击</option>
+        </select>
+        <div id="pActionDetail" style="margin-top:6px"><label>选择技能</label><select id="pActionSkill"></select></div>
+        <div id="pExtraActionArea" style="margin-top:10px;display:none">
+          <div style="font-size:12px;color:#7b6953;margin-bottom:5px">⚡ 额外行动</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <label style="cursor:pointer;font-size:13px;display:flex;align-items:center;gap:3px"><input type="radio" name="pExtraAction" value="none" checked onchange="updatePlayerActionUI()" style="width:15px;height:15px;cursor:pointer"> 无</label>
+            <label style="cursor:pointer;font-size:13px;display:flex;align-items:center;gap:3px"><input type="radio" name="pExtraAction" value="switch_after" onchange="updatePlayerActionUI()" style="width:15px;height:15px;cursor:pointer"> 技能后换宠</label>
+            <label style="cursor:pointer;font-size:13px;display:flex;align-items:center;gap:3px"><input type="radio" name="pExtraAction" value="bossify" onchange="updatePlayerActionUI()" style="width:15px;height:15px;cursor:pointer"> 首领化</label>
+          </div>
+          <div id="pExtraActionDetail" style="margin-top:6px;padding-left:2px"></div>
+        </div>
+      </div>
+      <div class="action-group">
+        <h4>🟥 敌方行动</h4>
+        <label>行动类型</label>
+        <select id="oActionType" onchange="updateOpponentActionUI()">
+          <option value="use_skill">释放技能</option>
+          <option value="switch">更换精灵</option>
+          <option value="recharge">聚能</option>
+          <option value="wish_strike">愿力冲击</option>
+        </select>
+        <div id="oActionDetail" style="margin-top:6px">
+          <label>选择已知技能 / 输入新技能名</label>
+          <select id="oActionSkill"></select>
+          <div style="margin-top:4px;display:flex;gap:4px;align-items:center">
+            <input id="oActionSkillManual" list="skillList" placeholder="或手动输入新技能..." style="flex:1" oninput="autoFillSkill('oActionSkillManual')">
+            <button class="btn btn-sm btn-primary" onclick="addOpponentSkill()">+ 记录</button>
+          </div>
+        </div>
+        <div id="oExtraActionArea" style="margin-top:10px;display:none">
+          <div style="font-size:12px;color:#7b6953;margin-bottom:5px">⚡ 额外行动</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <label style="cursor:pointer;font-size:13px;display:flex;align-items:center;gap:3px"><input type="radio" name="oExtraAction" value="none" checked onchange="updateOpponentActionUI()" style="width:15px;height:15px;cursor:pointer"> 无</label>
+            <label style="cursor:pointer;font-size:13px;display:flex;align-items:center;gap:3px"><input type="radio" name="oExtraAction" value="switch_after" onchange="updateOpponentActionUI()" style="width:15px;height:15px;cursor:pointer"> 技能后换宠</label>
+            <label style="cursor:pointer;font-size:13px;display:flex;align-items:center;gap:3px"><input type="radio" name="oExtraAction" value="bossify" onchange="updateOpponentActionUI()" style="width:15px;height:15px;cursor:pointer"> 首领化</label>
+          </div>
+          <div id="oExtraActionDetail" style="margin-top:6px;padding-left:2px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 结算 -->
+<div class="section">
+  <div class="section-title" onclick="toggleSection(this)"><span class="arrow">▼</span> 📊 结算</div>
+  <div class="section-body active" id="outcomeSection">
+    <table class="outcome-table">
+      <thead><tr><th style="width:100px">字段</th><th style="width:45%">我方</th><th style="width:45%">敌方</th></tr></thead>
+      <tbody>
+        <tr><td>Active 精灵</td><td class="auto-cell" id="ocPlayerPokemon">-</td><td class="auto-cell" id="ocOpponentPokemon">-</td></tr>
+        <tr><td>最大 HP</td><td class="auto-cell" id="ocPMaxHpDisplay">-</td><td class="auto-cell">100%</td></tr>
+        <tr><td>上回合HP</td><td class="auto-cell" id="ocPrevPHp">-</td><td class="auto-cell" id="ocPrevOHp">-</td></tr>
+        <tr><td>当前 HP</td><td><input id="ocPHp" type="number" min="0" value="0" oninput="updateDamageAuto()" onblur="if(this.value==='')this.value='0'"></td><td><input id="ocOHp" type="number" min="0" value="0" oninput="updateDamageAuto()" onblur="if(this.value==='')this.value='0'"></td></tr>
+        <tr><td>当前能量</td><td><input id="ocPEnergy" type="number" min="0" value="0"></td><td><input id="ocOEnergy" type="number" min="0" value="0"></td></tr>
+        <tr><td>受到伤害</td><td><input id="ocPDmg" type="number" readonly min="0" value="0" style="background:#faf3e5;color:#c0392b;border:1px solid #d8c29b;border-radius:3px;padding:4px 6px;font-size:12px;width:100%"></td><td><input id="ocODmg" type="number" readonly min="0" value="0" style="background:#faf3e5;color:#c0392b;border:1px solid #d8c29b;border-radius:3px;padding:4px 6px;font-size:12px;width:100%"></td></tr>
+        <tr><td>是否阵亡</td>
+          <td><select id="ocPDead" onchange="toggleDeathRow('P')"><option value="false">否</option><option value="true">是</option></select></td>
+          <td><select id="ocODead" onchange="toggleDeathRow('O')"><option value="false">否</option><option value="true">是</option></select></td>
+        </tr>
+        <tr id="ocDeductionRow"><td>扣除血量</td><td><span id="ocPDeductionDisplay" style="color:#b09e82;font-size:12px;display:none">\</span><input id="ocPDeduction" type="number" min="1" max="4" value="1" disabled style="width:100%;padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px"></td><td><span id="ocODeductionDisplay" style="color:#b09e82;font-size:12px;display:none">\</span><input id="ocODeduction" type="number" min="1" max="4" value="1" disabled style="width:100%;padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px"></td></tr>
+        <tr id="ocReplaceRow"><td>替换上场</td><td><select id="ocPReplaceWith" disabled style="width:100%;padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px" onchange="onDeathReplaceChange('P')"><option value="">-- 选择 --</option></select></td><td><select id="ocOReplaceWith" disabled style="width:100%;padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px" onchange="onDeathReplaceChange('O')"><option value="">-- 选择 --</option></select></td></tr>
+        <tr id="ocResurrectRow"><td>复活</td>
+          <td><label style="display:flex;align-items:center;gap:4px;white-space:nowrap"><select id="ocPResurrect" onchange="toggleResurrectRow('P')" disabled style="padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px"><option value="false">否</option><option value="true">是</option></select><span style="color:#7b6953;font-size:12px">几回合后复活:</span><span id="ocPResurrectAfterDisplay" style="color:#b09e82;font-size:12px;display:none">\</span><input id="ocPResurrectAfter" type="number" min="1" max="10" value="3" disabled style="width:48px;padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px"></label></td>
+          <td><label style="display:flex;align-items:center;gap:4px;white-space:nowrap"><select id="ocOResurrect" onchange="toggleResurrectRow('O')" disabled style="padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px"><option value="false">否</option><option value="true">是</option></select><span style="color:#7b6953;font-size:12px">几回合后复活:</span><span id="ocOResurrectAfterDisplay" style="color:#b09e82;font-size:12px;display:none">\</span><input id="ocOResurrectAfter" type="number" min="1" max="10" value="3" disabled style="width:48px;padding:4px 6px;border:1px solid #d8c29b;border-radius:3px;background:#faf3e5;color:#3f3528;font-size:12px"></label></td>
+        </tr>
+        <tr><td>结果描述</td><td class="auto-cell" id="ocPResult">-</td><td class="auto-cell" id="ocOResult">-</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 印记 & 状态 -->
+<div class="section" id="msSection">
+  <div class="section-title" onclick="toggleSection(this)">
+    <span class="arrow">▼</span> 🖊️ 印记 &amp; 状态
+    <span style="margin-left:auto;font-size:11px;color:#7b6953">我方: <span id="msActivePokemon">-</span> &nbsp;|&nbsp; 敌方: <span id="msOpponentPokemon">-</span></span>
+  </div>
+  <div class="section-body active" id="msBody">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:600;color:#3498db">🌐 我方印记</span>
+          <span style="font-size:11px;color:#7b6953">换宠不消失</span>
+          <button class="btn btn-sm btn-primary" onclick="addPMarkRow()">+</button>
+        </div>
+        <div id="pMarksContainer"></div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:600;color:#3498db">🌐 敌方印记</span>
+          <span style="font-size:11px;color:#7b6953">换宠不消失</span>
+          <button class="btn btn-sm btn-primary" onclick="addOMarkRow()">+</button>
+        </div>
+        <div id="oMarksContainer"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:600;color:#c9952e">⚡ 我方状态</span>
+          <span style="font-size:11px;color:#7b6953">仅当前精灵，下场清空</span>
+          <button class="btn btn-sm btn-primary" onclick="addPStatusRow()">+</button>
+        </div>
+        <div id="pStatusContainer"></div>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:600;color:#3498db">⚡ 敌方状态</span>
+          <span style="font-size:11px;color:#7b6953">仅当前精灵，下场清空</span>
+          <button class="btn btn-sm btn-primary" onclick="addOStatusRow()">+</button>
+        </div>
+        <div id="oStatusContainer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 导航 -->
+<div class="nav-bar">
+  <button class="btn btn-warning" onclick="backToTeamConfig()">🔄 重新开始</button>
+  <div style="flex:1"></div>
+  <button class="btn btn-success" onclick="confirmAndNextTurn()" id="btnNext">下一回合 ▶</button>
+</div>
+
+<!-- AI 策略分析 -->
+<div class="section" id="aiSection">
+  <div class="section-title" onclick="toggleSection(this)"><span class="arrow">▼</span> 🤖 AI 策略分析</div>
+  <div class="section-body" id="aiBody">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:13px">
+        <input type="checkbox" id="aiAutoAnalyze" checked style="width:15px;height:15px;cursor:pointer">
+        下一回合保存后自动分析
+      </label>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-bottom:8px">
+      <div style="flex:3;min-width:200px">
+        <label style="font-size:11px;color:#7b6953">API Key
+          <label style="font-size:11px;color:#7b6953;cursor:pointer;margin-left:6px">
+            <input type="checkbox" id="aiRememberKey" style="width:13px;height:13px;cursor:pointer;vertical-align:middle">
+            <span style="vertical-align:middle">记住</span>
+          </label>
+        </label>
+        <input id="aiApiKey" type="password" placeholder="API Key" style="width:100%;padding:5px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px">
+      </div>
+      <div style="display:flex;gap:8px;flex:1;min-width:220px">
+        <div style="flex:1;min-width:80px">
+          <label style="font-size:11px;color:#7b6953">大模型</label>
+          <select id="aiProvider" style="width:100%;padding:5px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px" onchange="onProviderChange('ai')">
+            <option value="dashscope">DashScope</option>
+            <option value="deepseek">DeepSeek</option>
+          </select>
+        </div>
+        <div style="flex:1;min-width:100px">
+          <label style="font-size:11px;color:#7b6953">具体模型</label>
+          <select id="aiModel" style="width:100%;padding:5px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px"></select>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="testAIConnection()">测试连接</button>
+      <button class="btn btn-sm btn-success" onclick="runAIAnalysis()">🔄 重新分析</button>
+      <button class="btn btn-sm btn-warning" onclick="clearAIResult()">清空结果</button>
+    </div>
+    <div id="aiResultArea" style="background:#faf3e5;border-radius:6px;padding:12px;min-height:60px;font-size:13px;line-height:1.7;white-space:pre-wrap;border:1px solid #e4dbca">
+      <span style="color:#b09e82">等待下一回合保存后自动生成分析...</span>
+    </div>
+  </div>
+</div>
+
+</div> <!-- /container -->
+</div> <!-- /battleView -->
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- ===== 错误捕获调试 ===== -->
+<div id="_debug" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#2a2018;color:#c9952e;padding:12px;font-size:13px;z-index:99999;max-height:150px;overflow:auto;border-top:2px solid #c9952e"></div>
+<script>
+  window.__MODULE_ERROR = null;
+  window.addEventListener('error', function(e) {
+    window.__MODULE_ERROR = e;
+    var d = document.getElementById('_debug');
+    if(d) { d.style.display = 'block'; d.innerHTML += '⚠ ' + (e.message||e) + '<br>'; }
+  });
+  window.addEventListener('unhandledrejection', function(e) {
+    window.__MODULE_ERROR = e.reason;
+    var d = document.getElementById('_debug');
+    if(d) { d.style.display = 'block'; d.innerHTML += '⚠ PROMISE: ' + (e.reason?.message||e.reason||'?') + '<br>'; }
+  });
+  // Delay check: after 3s, if no error, hide debug
+  setTimeout(function() {
+    if(!window.__MODULE_ERROR) {
+      var d = document.getElementById('_debug');
+      if(d) d.style.display = 'none';
+    }
+  }, 3000);
+</script>
+
+<!-- ===== ES Module 入口 ===== -->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

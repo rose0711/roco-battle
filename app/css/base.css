@@ -1,0 +1,43 @@
+/* ===== 主题色板 ===== */
+:root {
+  --bg-page: #fbf4e5;
+  --bg-card: #fff7e5;
+  --bg-card-hover: #f3ead8;
+  --border: #e4dbca;
+  --border-deep: #d8c29b;
+  --text-main: #3f3528;
+  --text-secondary: #7b6953;
+  --text-weak: #b09e82;
+  --accent: #c9952e;
+  --accent-hover: #dba538;
+  --danger: #c0392b;
+  --danger-hover: #a93226;
+  --success: #6aab7a;
+  --success-hover: #5a9a6a;
+  --warning: #d68910;
+  --warning-hover: #c0780e;
+}
+
+/* ===== Reset & Global ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:var(--bg-page);color:var(--text-main);min-height:100vh}
+
+/* ===== Buttons ===== */
+button,.btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;transition:.2s;color:#fff}
+.btn-danger{background:var(--danger)}
+.btn-danger:hover{background:var(--danger-hover)}
+.btn-primary{background:var(--accent)}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-success{background:var(--success)}
+.btn-success:hover{background:var(--success-hover)}
+.btn-warning{background:var(--warning)}
+.btn-warning:hover{background:var(--warning-hover)}
+.btn-sm{padding:5px 12px;font-size:12px}
+button:disabled{opacity:.5;cursor:not-allowed}
+
+/* ===== Toast ===== */
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:8px;color:#fff;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.toast.info{background:var(--accent)}

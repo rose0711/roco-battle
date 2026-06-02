@@ -1,0 +1,26 @@
+﻿# 系统文件
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.sublime-*
+*.suo
+
+# 日志
+*.log
+
+# 本地缓存（如果存在）
+app/js/.api_key_cache
+
+# 同步脚本（不纳入版本控制）
+sync_urls.py
+sync_images.py
+sync_sprites_image.py
+sync_skills.py
+__pycache__/
+*.pyc

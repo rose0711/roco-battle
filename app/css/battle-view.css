@@ -1,0 +1,96 @@
+/* ===== Battle View ===== */
+.header{background:var(--bg-card);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:3px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.header h1{font-size:22px;color:var(--text-main);font-weight:700}
+.header h1 small{font-size:14px;color:var(--text-weak);font-weight:400}
+.header-controls{display:flex;gap:10px;flex-wrap:wrap}
+
+.container{max-width:1400px;margin:0 auto;padding:16px}
+
+/* ===== HP Bar ===== */
+.game-hp{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg-card);gap:20px;flex-wrap:wrap;border:1px solid var(--border);border-radius:8px}
+.hp-side{display:flex;align-items:center;gap:12px}
+.hp-label{font-weight:600;min-width:40px;color:var(--text-main)}
+.hp-hearts{font-size:24px;letter-spacing:2px}
+.hp-hearts .lost{color:var(--text-weak)}
+.hp-hearts .alive{color:var(--accent)}
+.hp-input{width:50px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);color:var(--text-main);text-align:center;font-size:14px}
+.hp-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+
+/* ===== Pokemon Card ===== */
+.pokemon-card{background:var(--bg-card);border-radius:8px;padding:14px;border:1px solid var(--border)}
+.pokemon-card .card-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pokemon-card .sprite-box{width:80px;height:80px;border-radius:8px;background:var(--bg-page);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--border);flex-shrink:0}
+.pokemon-card .sprite-box img{max-width:100%;max-height:100%;object-fit:contain}
+.pokemon-card .sprite-box .no-img{color:var(--text-weak);font-size:11px;text-align:center;padding:4px}
+.pokemon-card .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.pokemon-card .info-grid .full{grid-column:1/-1}
+.pokemon-card label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:2px}
+.pokemon-card input,.pokemon-card select{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-page);color:var(--text-main);font-size:13px;transition:border-color .2s}
+/* ===== 卡片折叠详情 ===== */
+.card-details summary{font-size:12px;color:var(--text-weak);cursor:pointer;padding:2px 0;user-select:none;list-style:none}
+.card-details summary::-webkit-details-marker{display:none}
+.card-details summary:hover{color:var(--accent)}
+.pokemon-card input:focus,.pokemon-card select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}
+.pokemon-card .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;margin:2px;background:var(--bg-card-hover);color:var(--text-secondary);border:1px solid var(--border)}
+.pokemon-card .tag.type{background:var(--accent);color:#fff}
+
+.skills-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.skills-row .skill-item{display:flex;align-items:center;gap:6px}
+.skills-row .skill-icon{width:24px;height:24px;border-radius:4px;background:var(--bg-page);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1px solid var(--border)}
+.skills-row .skill-icon img{max-width:100%;max-height:100%}
+.skills-row input{flex:1;min-width:0}
+
+/* ===== Reserve Grid ===== */
+.reserve-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.reserve-slot{background:var(--bg-card);border-radius:6px;padding:10px;border:1px solid var(--border)}
+.reserve-slot .slot-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.reserve-slot .slot-img{width:40px;height:40px;border-radius:4px;background:var(--bg-page);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+.reserve-slot .slot-img img{max-width:100%;max-height:100%}
+.reserve-slot .slot-row{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.reserve-slot label{font-size:11px;color:var(--text-secondary);display:block}
+.reserve-slot input{width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg-page);color:var(--text-main);font-size:12px;transition:border-color .2s}
+.reserve-slot input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}
+
+/* ===== Action Section ===== */
+.action-section{padding:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px}
+.action-group{border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--bg-card)}
+.action-group h4{font-size:14px;color:var(--accent);margin-bottom:8px}
+.action-group label{font-size:12px;color:var(--text-secondary);display:block;margin:6px 0 2px}
+.action-group select,.action-group input{width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-page);color:var(--text-main);font-size:13px;transition:border-color .2s}
+.action-group select:focus,.action-group input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}
+
+/* ===== Outcome Table ===== */
+.outcome-table{width:100%;border-collapse:collapse;font-size:13px}
+.outcome-table th,.outcome-table td{padding:6px 10px;border:1px solid var(--border);text-align:left}
+.outcome-table th{background:var(--bg-card);color:var(--text-secondary);font-weight:600;white-space:nowrap}
+.outcome-table input,.outcome-table select{width:100%;padding:4px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg-page);color:var(--text-main);font-size:12px;transition:border-color .2s}
+.outcome-table input:focus,.outcome-table select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,149,46,.15)}
+.outcome-table .auto-cell{color:var(--accent)}
+
+.nav-bar{display:flex;justify-content:center;gap:12px;padding:16px;flex-wrap:wrap}
+.nav-bar button{min-width:120px}
+
+.opponent-unknown-option{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 0}
+.opponent-unknown-option label{font-size:13px;cursor:pointer;color:var(--text-main)}
+.opponent-unknown-option input[type=radio]{cursor:pointer;accent-color:var(--accent)}
+
+.ability-box{background:var(--bg-page);border-radius:4px;padding:6px 10px;font-size:12px;color:var(--text-secondary);margin-top:6px;border-left:3px solid var(--accent)}
+
+.rules-panel{background:var(--bg-card);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--text-secondary);line-height:1.8;margin-bottom:10px;border:1px solid var(--border)}
+.rules-panel strong{color:var(--text-main)}
+.turn-badge{display:inline-block;background:var(--accent);color:#fff;padding:4px 14px;border-radius:20px;font-size:14px;font-weight:700}
+.toggle-enemy-reserve{margin:4px 0}
+
+/* ===== 印记类型标签 ===== */
+.mark-type-badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600;margin-right:4px;vertical-align:middle}
+.mark-type-positive{background:var(--success);color:#fff}
+.mark-type-negative{background:var(--danger);color:#fff}
+
+/* ===== Reserve Readonly Display ===== */
+.reserve-readonly{background:var(--bg-card);border-radius:6px;padding:10px;border:1px solid var(--border)}
+.reserve-readonly .r-name{font-size:13px;font-weight:600;color:var(--text-main)}
+.reserve-readonly .r-sub{font-size:11px;color:var(--text-secondary)}

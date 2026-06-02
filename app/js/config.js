@@ -1,0 +1,56 @@
+// ============================================================
+// config.js — 常量、默认值、API 配置
+// ============================================================
+
+/** API 提供商 → 可用模型映射 */
+export const PROVIDER_MODELS = {
+  dashscope: [
+    { value: 'qwen-plus', label: 'qwen-plus' },
+    { value: 'qwen-max', label: 'qwen-max' },
+    { value: 'qwen-turbo', label: 'qwen-turbo' }
+  ],
+  deepseek: [
+    { value: 'deepseek-chat', label: 'deepseek-v4-flash' },
+    { value: 'deepseek-reasoner', label: 'deepseek-v4-pro' }
+  ]
+};
+
+/** CSV 文件路径映射（相对于 index.html） */
+export const DATA_PATHS = {
+  skills: 'data/skills.csv',
+  sprites: 'data/sprites.csv',
+  urls: 'data/urls.csv',
+  marks: 'data/marks.csv',
+  status: 'data/status.csv',
+  bossed: 'data/Bossed.csv'
+};
+
+/** 默认 AI Prompt（文件不可用时 fallback） */
+export const DEFAULT_BATTLE_PROMPT = `你是一个精通《洛克王国》对战的回合制游戏策略专家。
+请根据以下给出的核心规则以及当前回合结束后的战场局势快照，为我方在下一回合的行动做出深度推演，给出明确指令。
+
+==== 战场快照 ====
+{{SNAPSHOT}}
+
+==== 我方阵容分析 ====
+{{TEAM_ANALYSIS}}
+
+请按以下框架分析：
+1. 局势痛点深度剖析（状态印记、血脉连锁、攻防匹配）
+2. 敌方行动博弈预测（技能能量、战术意图、备战席联动）
+3. 我方行动方案推演（留场、换宠、聚能）
+4. 最终决策指令——格式：
+【最终决策：使用技能"XXX"】 或 【最终决策：更换精灵为"XXX"】 或 【最终决策：选择聚能】`;
+
+export const DEFAULT_TEAM_PROMPT = `你是一位顶级的《洛克王国世界》6v6战术分析师。
+请根据下面我方6只精灵的完整配置，分析阵容打法，明确指出：
+
+1. **主力输出**（谁担任主攻手，为什么）
+2. **辅助/挂buff手**（谁为队友提供增益、续航或控场，特别注意一些特性对主攻手的加成）
+3. **联防/抗伤位**（谁负责承受伤害、切换吃技能、反制敌方）
+4. **战术轮转思路**（如何换宠等）
+
+请给出清晰的分工和理由，基于属性克制、技能效果、血脉特性综合判断。总字数不超过500字。
+
+==== 我方阵容 ====
+{{TEAM_LINES}}`;

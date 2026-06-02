@@ -1,0 +1,20 @@
+/* ===== Type Badges ===== */
+.type-badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin:1px;color:#fff}
+.type-badge.light{background:#f1c40f;color:#333}
+.type-badge.ice{background:#00cec9;color:#fff}
+.type-badge.ground{background:#d68910;color:#fff}
+.type-badge.illusion{background:#9b59b6;color:#fff}
+.type-badge.ghost{background:#6c5ce7;color:#fff}
+.type-badge.dark{background:#2d3436;color:#fff}
+.type-badge.normal{background:#636e72;color:#fff}
+.type-badge.mechanical{background:#74b9ff;color:#333}
+.type-badge.fighting{background:#d63031;color:#fff}
+.type-badge.poison{background:#6c5ce7;color:#fff}
+.type-badge.water{background:#0984e3;color:#fff}
+.type-badge.fire{background:#e17055;color:#fff}
+.type-badge.electric{background:#fdcb6e;color:#333}
+.type-badge.wind{background:#81ecec;color:#333}
+.type-badge.grass{background:#00b894;color:#fff}
+.type-badge.cute{background:#fd79a8;color:#fff}
+.type-badge.bug{background:#00b894;color:#fff}
+.type-badge.dragon{background:#6c5ce7;color:#fff}
