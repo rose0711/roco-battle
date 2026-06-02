@@ -15,7 +15,10 @@ Desktop.ini
 *.log
 
 # 本地缓存（如果存在）
-app/js/.api_key_cache
+js/.api_key_cache
+
+# 遗留的空目录
+app/
 
 # 同步脚本（不纳入版本控制）
 sync_urls.py
