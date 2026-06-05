@@ -12,16 +12,23 @@ export function htmlEscape(s) {
 
 // ===== 试用模式 UI 切换 =====
 export function toggleTrialUI(enabled) {
-  // API Key 整列 → 隐藏，Provider/Model 不变但下拉→静态文本
+  // API Key 整列 → 隐藏
   document.querySelectorAll('.api-key-col').forEach(el => {
     el.style.display = enabled ? 'none' : '';
   });
 
-  // Provider/Model 下拉框 → 隐藏
-  document.querySelectorAll('#tcAiProvider, #aiProvider, #tcAiModel, #aiModel').forEach(el => {
+  // 阵容分析区：Provider/Model 整列 → 隐藏，组合文本 → 显示
+  document.querySelectorAll('.tc-provider-col, .tc-model-col').forEach(el => {
     el.style.display = enabled ? 'none' : '';
   });
-  // Provider/Model 静态文本 → 显示
+  document.querySelectorAll('.trial-mode-combo').forEach(el => {
+    el.style.display = enabled ? 'inline' : 'none';
+  });
+
+  // AI 策略分析区：Provider/Model 下拉框 → 隐藏，静态文本 → 显示
+  document.querySelectorAll('#aiProvider, #aiModel').forEach(el => {
+    el.style.display = enabled ? 'none' : '';
+  });
   document.querySelectorAll('.trial-provider-text, .trial-model-text').forEach(el => {
     el.style.display = enabled ? '' : 'none';
   });
