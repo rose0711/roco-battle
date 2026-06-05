@@ -84,6 +84,17 @@
             </label>
           </label>
           <input type="password" id="tcAiApiKey" placeholder="API Key">
+          <details style="margin-top:6px;font-size:12px;color:#7b6953">
+            <summary style="cursor:pointer;color:#b09e82;font-size:11px">📖 DeepSeek API 配置说明</summary>
+            <div style="margin-top:6px;padding:8px 10px;background:#faf3e5;border:1px solid #e4dbca;border-radius:4px;line-height:1.7">
+              1️⃣ 注册 <a href="https://platform.deepseek.com" target="_blank" style="color:#27ae60">platform.deepseek.com</a> → 创建 API Key<br>
+              2️⃣ 充值少量余额（几块钱够用很久）<br>
+              3️⃣ 把 API Key 粘贴到上方输入框<br>
+              4️⃣ 选择模型（默认 deepseek-v4-flash）<br>
+              5️⃣ 关闭试用模式即可使用自己的 Key<br>
+              <span style="color:#b09e82;font-size:11px">🔒 API Key 仅存储在浏览器本地，不会上传</span>
+            </div>
+          </details>
         </div>
         <div style="flex:1" class="tc-provider-col">
           <label>大模型</label>
@@ -104,7 +115,7 @@
         <button class="btn btn-primary" onclick="runTeamAnalysis()">🤖 AI 生成分析</button>
         <button class="btn btn-primary" onclick="runTeamAnalysisPrecise()">🔬 精确分析</button>
         <button class="btn btn-sm btn-primary" onclick="testTeamAIConnection()">测试连接</button>
-        <span class="trial-badge" style="display:none;font-size:12px;color:#fff;background:#27ae60;padding:4px 10px;border-radius:4px;font-weight:bold">☁️ 试用模式已开启（每日 20 次）</span>
+        <span class="trial-badge" style="display:none;font-size:12px;color:#fff;background:#27ae60;padding:4px 10px;border-radius:4px;font-weight:bold">☁️ 试用模式已开启（每日 3 次）</span>
         <span style="font-size:11px;color:#7b6953">💡 填写我方精灵后点击生成</span>
       </div>
     </div>
@@ -452,6 +463,17 @@
           </label>
         </label>
         <input id="aiApiKey" type="password" placeholder="API Key" style="width:100%;padding:5px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px">
+        <details style="margin-top:4px;font-size:12px;color:#7b6953">
+          <summary style="cursor:pointer;color:#b09e82;font-size:11px">📖 DeepSeek API 配置说明</summary>
+          <div style="margin-top:6px;padding:8px 10px;background:#faf3e5;border:1px solid #e4dbca;border-radius:4px;line-height:1.7">
+            1️⃣ 注册 <a href="https://platform.deepseek.com" target="_blank" style="color:#27ae60">platform.deepseek.com</a> → 创建 API Key<br>
+            2️⃣ 充值少量余额（几块钱够用很久）<br>
+            3️⃣ 把 API Key 粘贴到上方输入框<br>
+            4️⃣ 选择模型（默认 deepseek-v4-flash）<br>
+            5️⃣ 关闭试用模式即可使用自己的 Key<br>
+            <span style="color:#b09e82;font-size:11px">🔒 API Key 仅存储在浏览器本地，不会上传</span>
+          </div>
+        </details>
       </div>
       <div style="display:flex;gap:8px;flex:1;min-width:220px">
         <div style="flex:1;min-width:80px" class="ai-provider-col">
@@ -473,7 +495,7 @@
         <button class="btn btn-sm btn-primary" onclick="testAIConnection()">测试连接</button>
         <button class="btn btn-sm btn-success" onclick="runAIAnalysis()">🔄 重新分析</button>
         <button class="btn btn-sm btn-warning" onclick="clearAIResult()">清空结果</button>
-        <span class="trial-badge" style="display:none;font-size:12px;color:#fff;background:#27ae60;padding:4px 10px;border-radius:4px;font-weight:bold">☁️ 试用模式已开启（每日 20 次）</span>
+        <span class="trial-badge" style="display:none;font-size:12px;color:#fff;background:#27ae60;padding:4px 10px;border-radius:4px;font-weight:bold">☁️ 试用模式已开启（每日 3 次）</span>
       </div>
     </div>
     <div id="aiResultArea" style="background:#faf3e5;border-radius:6px;padding:12px;min-height:60px;font-size:13px;line-height:1.7;white-space:pre-wrap;border:1px solid #e4dbca">

@@ -2,7 +2,7 @@
 
 > 《洛克王国：世界》6v6 回合制辅助工具 —— 手动记录战局 + AI 辅助策略分析
 
-> 🔗 立即体验：[http://roco07.oss-cn-hangzhou.aliyuncs.com/](http://roco07.oss-cn-hangzhou.aliyuncs.com/)
+> 🔗 立即体验：[https://rose0711.github.io/roco-battle/](https://rose0711.github.io/roco-battle/)
 
 ---
 
