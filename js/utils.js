@@ -10,6 +10,28 @@ export function htmlEscape(s) {
   return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ===== 试用模式 UI 切换 =====
+export function toggleTrialUI(enabled) {
+  // API Key 整列 → 隐藏，Provider/Model 不变但下拉→静态文本
+  document.querySelectorAll('.api-key-col').forEach(el => {
+    el.style.display = enabled ? 'none' : '';
+  });
+
+  // Provider/Model 下拉框 → 隐藏
+  document.querySelectorAll('#tcAiProvider, #aiProvider, #tcAiModel, #aiModel').forEach(el => {
+    el.style.display = enabled ? 'none' : '';
+  });
+  // Provider/Model 静态文本 → 显示
+  document.querySelectorAll('.trial-provider-text, .trial-model-text').forEach(el => {
+    el.style.display = enabled ? '' : 'none';
+  });
+
+  // 试用 badge
+  document.querySelectorAll('.trial-badge').forEach(el => {
+    el.style.display = enabled ? '' : 'none';
+  });
+}
+
 // ===== Toast 通知 =====
 export function showToast(msg, type) {
   const el = document.getElementById('toast');

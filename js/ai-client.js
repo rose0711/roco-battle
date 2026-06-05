@@ -2,9 +2,9 @@
 // ai-client.js — AI API 调用封装
 // ============================================================
 
-import { PROVIDER_MODELS, DEFAULT_BATTLE_PROMPT, DEFAULT_TEAM_PROMPT } from './config.js';
+import { PROVIDER_MODELS, DEFAULT_BATTLE_PROMPT, DEFAULT_TEAM_PROMPT, DEFAULT_TEAM_PRECISE_PROMPT, TRIAL_WORKER_URL } from './config.js';
 import { dataLoaded, BOSSED_DB } from './csv-loader.js';
-import { showToast, htmlEscape } from './utils.js';
+import { showToast, htmlEscape, toggleTrialUI } from './utils.js';
 import { collectPokemonBase } from './utils.js';
 import { store } from './store.js';
 import { getSkillDisplay } from './utils.js';
@@ -95,8 +95,49 @@ export function getAIProvider(model) {
   return 'dashscope';
 }
 
+// ===== 试用模式 =====
+export let isTrialMode = false;
+
+export function setTrialMode(enabled) {
+  isTrialMode = enabled;
+  toggleTrialUI(enabled);
+  showToast(enabled ? '☁️ 已开启试用模式' : '已关闭试用模式，请输入自己的 API Key', enabled ? 'success' : 'info');
+}
+
+// 初始化试用模式（默认关闭）
+export function initTrialMode() {
+  isTrialMode = false;
+  toggleTrialUI(false);
+}
+
+// 切换试用模式开/关
+export function toggleTrial() {
+  setTrialMode(!isTrialMode);
+}
+
 // ===== API 调用 =====
 export async function callAI(prompt, apiKey, model) {
+  // 试用模式：走 Worker 代理，忽略本地 API Key
+  if (isTrialMode) {
+    const resp = await fetch(TRIAL_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model || 'deepseek-v4-flash',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      const errMsg = data.message || data.error || JSON.stringify(data);
+      if (resp.status === 429) {
+        throw new Error('😅 ' + errMsg);
+      }
+      throw new Error('试用请求失败 (' + resp.status + '): ' + errMsg);
+    }
+    return data.choices?.[0]?.message?.content || JSON.stringify(data);
+  }
+
   const provider = getAIProvider(model);
 
   if (provider === 'deepseek') {
@@ -326,27 +367,18 @@ export async function testAIConnection() {
 }
 
 // ===== Team AI =====
-export async function runTeamAnalysis() {
-  const tcKeyEl = document.getElementById('tcAiApiKey');
-  if (!tcKeyEl.value.trim()) {
-    const battleKey = document.getElementById('aiApiKey').value.trim();
-    if (battleKey) tcKeyEl.value = battleKey;
-  }
-  maybeSaveAIKey('tcAiApiKey', 'tcAiRememberKey', 'tcAiProvider');
-  const apiKey = tcKeyEl.value.trim();
-  if (!apiKey) { showToast('请先填写 API Key','error'); return; }
 
-  // collect team config from the module
+/** 收集阵容数据并构建简单分析 prompt */
+async function _buildTeamAnalysisPrompt() {
   window.collectTeamConfig && window.collectTeamConfig();
   const pets = (_teamConfigRef?.player?.pets) || [];
   const hasAny = pets.some(p => p.name);
-  if (!hasAny) { showToast('请至少配置一只我方精灵','error'); return; }
+  if (!hasAny) { showToast('请至少配置一只我方精灵','error'); return null; }
 
   const teamLines = pets.filter(p => p.name).map((p, i) => {
     const skillsText = (p.skills||[]).filter(s => s && s.name).map(s =>
       '    - ' + s.name + ' [' + (s.category || '?') + '] 威力:' + (s.power || '?') + ' 耗能:' + (s.energy || '?') + (s.effect ? ' → ' + s.effect : '')
     ).join('\n');
-    // 首领化信息
     let bossLine = '';
     if (p.canBossify && p.name) {
       const bossEntry = BOSSED_DB[p.name];
@@ -361,7 +393,21 @@ export async function runTeamAnalysis() {
   }).join('\n');
 
   const teamTemplate = await loadPromptFile('data/prompt_team_ai.txt', DEFAULT_TEAM_PROMPT);
-  const prompt = teamTemplate.replace('{{TEAM_LINES}}', teamLines);
+  return teamTemplate.replace('{{TEAM_LINES}}', teamLines);
+}
+
+export async function runTeamAnalysis() {
+  const tcKeyEl = document.getElementById('tcAiApiKey');
+  if (!tcKeyEl.value.trim()) {
+    const battleKey = document.getElementById('aiApiKey').value.trim();
+    if (battleKey) tcKeyEl.value = battleKey;
+  }
+  maybeSaveAIKey('tcAiApiKey', 'tcAiRememberKey', 'tcAiProvider');
+  const apiKey = tcKeyEl.value.trim();
+  if (!apiKey) { showToast('请先填写 API Key','error'); return; }
+
+  const prompt = await _buildTeamAnalysisPrompt();
+  if (!prompt) return;
 
   const textarea = document.getElementById('tcTeamAnalysis');
   if (!textarea) return;
@@ -376,6 +422,74 @@ export async function runTeamAnalysis() {
     stopWait();
     textarea.value = '❌ 生成失败: ' + e.message;
     showToast('AI 生成失败: ' + e.message,'error');
+  }
+}
+
+/** 精确阵容分析：运行 3 次简单分析，再合成一份精确结果 */
+export async function runTeamAnalysisPrecise() {
+  const tcKeyEl = document.getElementById('tcAiApiKey');
+  if (!tcKeyEl.value.trim()) {
+    const battleKey = document.getElementById('aiApiKey').value.trim();
+    if (battleKey) tcKeyEl.value = battleKey;
+  }
+  maybeSaveAIKey('tcAiApiKey', 'tcAiRememberKey', 'tcAiProvider');
+  const apiKey = tcKeyEl.value.trim();
+  if (!apiKey) { showToast('请先填写 API Key','error'); return; }
+
+  const prompt = await _buildTeamAnalysisPrompt();
+  if (!prompt) return;
+
+  const textarea = document.getElementById('tcTeamAnalysis');
+  if (!textarea) return;
+
+  const model = document.getElementById('tcAiModel').value;
+  let elapsed = 0;
+  const interval = setInterval(() => {
+    elapsed++;
+    textarea.value = '⏳ 正在精确分析 ' + elapsed + 's…';
+  }, 1000);
+  const stopTimer = () => clearInterval(interval);
+
+  // 并行执行 3 次简单分析
+  const results = await Promise.allSettled(
+    [1, 2, 3].map(i => callAI(prompt, apiKey, model))
+  );
+
+  const validResults = results
+    .filter(r => r.status === 'fulfilled' && r.value && r.value.trim())
+    .map(r => r.value.trim());
+
+  if (validResults.length === 0) {
+    stopTimer();
+    const errMsg = results.find(r => r.status === 'rejected')?.reason?.message || '所有分析均失败';
+    textarea.value = '❌ 精确分析失败: ' + errMsg;
+    showToast('精确分析失败: ' + errMsg, 'error');
+    return;
+  }
+
+  // 构建合成 prompt
+  const preciseTemplate = await loadPromptFile('data/prompt_team_ai_precise.txt', DEFAULT_TEAM_PRECISE_PROMPT);
+  const synthesisPrompt = preciseTemplate
+    .replace('{{ANALYSIS_1}}', validResults[0] || '（数据缺失）')
+    .replace('{{ANALYSIS_2}}', validResults[1] || '（数据缺失）')
+    .replace('{{ANALYSIS_3}}', validResults[2] || '（数据缺失）');
+
+  // 调用 AI 合成最终精确分析
+  try {
+    const finalText = await callAI(synthesisPrompt, apiKey, model);
+    stopTimer();
+    textarea.value = finalText;
+    if (validResults.length < 3) {
+      showToast('精确分析已完成（基于 ' + validResults.length + '/3 次分析合成）', 'warning');
+    } else {
+      showToast('精确分析已完成', 'success');
+    }
+  } catch(e) {
+    stopTimer();
+    // 即使合成失败，也保留3次分析结果供参考
+    textarea.value = validResults.map((r, i) => '--- 第' + (i+1) + '次分析 ---\n' + r).join('\n\n') +
+      '\n\n--- 合成失败: ' + e.message + ' ---';
+    showToast('精确分析合成失败，已保留各次分析结果', 'error');
   }
 }
 

@@ -27,3 +27,6 @@ sync_sprites_image.py
 sync_skills.py
 __pycache__/
 *.pyc
+
+# Cloudflare Worker（不上传，直接部署到 CF）
+trial-worker.js

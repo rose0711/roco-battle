@@ -75,30 +75,38 @@
     <textarea id="tcTeamAnalysis" placeholder="可手动编写阵容分析，或点击下方 AI 按钮自动生成…"></textarea>
     <div class="tc-analysis-footer">
       <div class="api-group">
-        <div>
+        <div class="api-key-col">
           <label>API Key
             <label style="font-size:11px;color:#7b6953;cursor:pointer;margin-left:4px;font-weight:400">
               <input type="checkbox" id="tcAiRememberKey" style="width:13px;height:13px;cursor:pointer;vertical-align:middle">
               <span style="vertical-align:middle">记住</span>
+              <span class="api-security-note" style="vertical-align:middle;font-size:11px;color:#b09e82;margin-left:8px">API Key 仅存储在浏览器本地 localStorage，不会上传到任何第三方服务器</span>
             </label>
           </label>
           <input type="password" id="tcAiApiKey" placeholder="API Key">
         </div>
-        <div style="flex:1">
+        <div style="flex:1" class="tc-provider-col">
           <label>大模型</label>
           <select id="tcAiProvider" style="width:100%" onchange="onProviderChange('tcAi')">
-            <option value="dashscope">DashScope</option>
             <option value="deepseek">DeepSeek</option>
+            <option value="dashscope">DashScope</option>
           </select>
+          <span class="trial-provider-text" style="display:none;padding:5px 8px;background:#faf3e5;border:1px solid #d8c29b;border-radius:4px;font-size:13px;color:#3f3528">DeepSeek</span>
         </div>
-        <div style="flex:1">
+        <div style="flex:1" class="tc-model-col">
           <label>具体模型</label>
           <select id="tcAiModel" style="width:100%"></select>
+          <span class="trial-model-text" style="display:none;padding:5px 8px;background:#faf3e5;border:1px solid #d8c29b;border-radius:4px;font-size:13px;color:#3f3528">deepseek-v4-flash</span>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="runTeamAnalysis()">🤖 AI 生成分析</button>
-      <button class="btn btn-sm btn-primary" onclick="testTeamAIConnection()">测试连接</button>
-      <span style="font-size:11px;color:#7b6953">💡 填写我方精灵后点击生成</span>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+        <button class="btn btn-primary" onclick="toggleTrial()" style="border:1px solid #27ae60;color:#27ae60;background:#fff">☁️ 试用模式</button>
+        <button class="btn btn-primary" onclick="runTeamAnalysis()">🤖 AI 生成分析</button>
+        <button class="btn btn-primary" onclick="runTeamAnalysisPrecise()">🔬 精确分析</button>
+        <button class="btn btn-sm btn-primary" onclick="testTeamAIConnection()">测试连接</button>
+        <span class="trial-badge" style="display:none;font-size:12px;color:#fff;background:#27ae60;padding:4px 10px;border-radius:4px;font-weight:bold">☁️ 试用模式已开启（每日 20 次）</span>
+        <span style="font-size:11px;color:#7b6953">💡 填写我方精灵后点击生成</span>
+      </div>
     </div>
   </div>
 </div>
@@ -436,7 +444,7 @@
       </label>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-bottom:8px">
-      <div style="flex:3;min-width:200px">
+      <div style="flex:3;min-width:200px" class="api-key-col">
         <label style="font-size:11px;color:#7b6953">API Key
           <label style="font-size:11px;color:#7b6953;cursor:pointer;margin-left:6px">
             <input type="checkbox" id="aiRememberKey" style="width:13px;height:13px;cursor:pointer;vertical-align:middle">
@@ -446,21 +454,27 @@
         <input id="aiApiKey" type="password" placeholder="API Key" style="width:100%;padding:5px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px">
       </div>
       <div style="display:flex;gap:8px;flex:1;min-width:220px">
-        <div style="flex:1;min-width:80px">
+        <div style="flex:1;min-width:80px" class="ai-provider-col">
           <label style="font-size:11px;color:#7b6953">大模型</label>
           <select id="aiProvider" style="width:100%;padding:5px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px" onchange="onProviderChange('ai')">
-            <option value="dashscope">DashScope</option>
             <option value="deepseek">DeepSeek</option>
+            <option value="dashscope">DashScope</option>
           </select>
+          <span class="trial-provider-text" style="display:none;padding:5px 8px;background:#faf3e5;border:1px solid #d8c29b;border-radius:4px;font-size:13px;color:#3f3528">DeepSeek</span>
         </div>
-        <div style="flex:1;min-width:100px">
+        <div style="flex:1;min-width:100px" class="ai-model-col">
           <label style="font-size:11px;color:#7b6953">具体模型</label>
           <select id="aiModel" style="width:100%;padding:5px 8px;border:1px solid #d8c29b;border-radius:4px;background:#faf3e5;color:#3f3528;font-size:13px"></select>
+          <span class="trial-model-text" style="display:none;padding:5px 8px;background:#faf3e5;border:1px solid #d8c29b;border-radius:4px;font-size:13px;color:#3f3528">deepseek-v4-flash</span>
         </div>
       </div>
-      <button class="btn btn-sm btn-primary" onclick="testAIConnection()">测试连接</button>
-      <button class="btn btn-sm btn-success" onclick="runAIAnalysis()">🔄 重新分析</button>
-      <button class="btn btn-sm btn-warning" onclick="clearAIResult()">清空结果</button>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+        <button class="btn btn-sm" onclick="toggleTrial()" style="border:1px solid #27ae60;color:#27ae60;background:#fff;padding:5px 12px;font-size:13px">☁️ 试用模式</button>
+        <button class="btn btn-sm btn-primary" onclick="testAIConnection()">测试连接</button>
+        <button class="btn btn-sm btn-success" onclick="runAIAnalysis()">🔄 重新分析</button>
+        <button class="btn btn-sm btn-warning" onclick="clearAIResult()">清空结果</button>
+        <span class="trial-badge" style="display:none;font-size:12px;color:#fff;background:#27ae60;padding:4px 10px;border-radius:4px;font-weight:bold">☁️ 试用模式已开启（每日 20 次）</span>
+      </div>
     </div>
     <div id="aiResultArea" style="background:#faf3e5;border-radius:6px;padding:12px;min-height:60px;font-size:13px;line-height:1.7;white-space:pre-wrap;border:1px solid #e4dbca">
       <span style="color:#b09e82">等待下一回合保存后自动生成分析...</span>

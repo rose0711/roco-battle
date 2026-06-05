@@ -27,7 +27,8 @@ import {
   setTeamConfigRef as setAiTeamConfigRef,
   setTurnDataRef as setAiTurnDataRef,
   populateModels, onProviderChange, hookProviderSync, loadAIKey,
-  runAIAnalysis, clearAIResult, testAIConnection, runTeamAnalysis, testTeamAIConnection
+  runAIAnalysis, clearAIResult, testAIConnection, runTeamAnalysis, runTeamAnalysisPrecise, testTeamAIConnection,
+  setTrialMode, initTrialMode, toggleTrial
 } from './ai-client.js';
 
 // ===== 5. 印记 & 状态 =====
@@ -38,6 +39,9 @@ setTeamConfigRef(teamConfig);
 setFileIoBattleRef(battle);
 setAiBattleRef(battle);
 setAiTeamConfigRef(teamConfig);
+
+// 初始化试用模式（从 sessionStorage 恢复）
+initTrialMode();
 
 // 载入存档后的状态恢复回调
 setOnLoadCallback(async function(data) {
@@ -81,7 +85,9 @@ window.runAIAnalysis = runAIAnalysis;
 window.clearAIResult = clearAIResult;
 window.testAIConnection = testAIConnection;
 window.runTeamAnalysis = runTeamAnalysis;
+window.runTeamAnalysisPrecise = runTeamAnalysisPrecise;
 window.testTeamAIConnection = testTeamAIConnection;
+window.toggleTrial = toggleTrial;
 window.onProviderChange = onProviderChange;
 window.renderMarksStatus = renderMarksStatus;
 window.updateMsActivePokemon = updateMsActivePokemon;
