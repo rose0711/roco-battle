@@ -29,12 +29,12 @@ export function populateModels(prefix) {
 }
 
 export function onProviderChange(prefix) {
-  populateModels(prefix);
   const providerEl = document.getElementById(prefix + 'Provider');
   const keyInput = document.getElementById(prefix + 'ApiKey');
   const checkbox = document.getElementById(prefix + 'RememberKey');
   if (!keyInput || !providerEl) return;
   try {
+    populateModels(prefix);
     const saved = localStorage.getItem('saved_ai_' + providerEl.value);
     if (saved) {
       keyInput.value = saved;
@@ -42,8 +42,26 @@ export function onProviderChange(prefix) {
     } else {
       keyInput.value = '';
       if (checkbox) checkbox.checked = false;
+      localStorage.removeItem('saved_ai_' + providerEl.value);
     }
   } catch(e) {}
+}
+
+// ===== 清除已保存的 API Key =====
+export function clearSavedAIKeys() {
+  ['deepseek', 'dashscope'].forEach(provider => {
+    localStorage.removeItem('saved_ai_' + provider);
+  });
+  // 同时清空输入框和取消勾选
+  ['aiApiKey', 'tcAiApiKey'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['aiRememberKey', 'tcAiRememberKey'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+  showToast('已清除所有保存的 API Key', 'success');
 }
 
 function maybeSaveAIKey(inputId, checkboxId, providerId) {
@@ -66,6 +84,9 @@ export function loadAIKey(inputId, providerId, checkboxId) {
     if (saved) {
       key.value = saved;
       if (checkbox) checkbox.checked = true;
+    } else {
+      key.value = '';
+      if (checkbox) checkbox.checked = false;
     }
   } catch(e) {}
 }
@@ -78,11 +99,7 @@ export function hookProviderSync(prefix) {
   providerEl.addEventListener('change', function() {
     onProviderChange(prefix);
   });
-  if (keyInput) {
-    keyInput.addEventListener('blur', function() {
-      maybeSaveAIKey(prefix + 'ApiKey', prefix + 'RememberKey', prefix + 'Provider');
-    });
-  }
+
   if (checkbox) {
     checkbox.addEventListener('change', function() {
       if (checkbox.checked) maybeSaveAIKey(prefix + 'ApiKey', prefix + 'RememberKey', prefix + 'Provider');
@@ -123,7 +140,7 @@ export async function callAI(prompt, apiKey, model) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model || 'deepseek-v4-flash',
+        model: 'deepseek-v4-flash',
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -168,24 +185,7 @@ export async function callAI(prompt, apiKey, model) {
       : JSON.stringify(data));
 }
 
-async function testAI(apiKey, model) {
-  const provider = getAIProvider(model);
-  if (provider === 'deepseek') {
-    const resp = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
-      body: JSON.stringify({ model, messages: [{ role: 'user', content: '你好' }] })
-    });
-    if (!resp.ok) throw new Error('连接失败: '+resp.status);
-    return;
-  }
-  const resp = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
-    method: 'POST',
-    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey },
-    body: JSON.stringify({ model, input: { prompt: '你好' } })
-  });
-  if (!resp.ok) throw new Error('连接失败: '+resp.status);
-}
+
 
 // ===== Prompt 文件加载 =====
 async function loadPromptFile(fileName, fallbackText) {
@@ -310,7 +310,7 @@ function setAIResult(text, color) {
 export async function runAIAnalysis() {
   maybeSaveAIKey('aiApiKey', 'aiRememberKey', 'aiProvider');
   const apiKey = document.getElementById('aiApiKey').value.trim();
-  if (!apiKey) { setAIResult('⚠️ 请先填写 API Key','#c9952e'); return; }
+  if (!apiKey && !isTrialMode) { setAIResult('⚠️ 请先填写 API Key 或开启试用模式','#c9952e'); return; }
   if (!_battleRef || _battleRef.turns.length === 0) { setAIResult('⚠️ 还没有回合数据','#f39c12'); return; }
 
   const waitEl = document.getElementById('aiResultArea');
@@ -354,17 +354,7 @@ export function clearAIResult() {
   setAIResult('等待下一回合保存后自动生成分析...','#b09e82');
 }
 
-export async function testAIConnection() {
-  maybeSaveAIKey('aiApiKey', 'aiRememberKey', 'aiProvider');
-  const apiKey = document.getElementById('aiApiKey').value.trim();
-  if (!apiKey) { showToast('请先填写 API Key','error'); return; }
-  try {
-    await testAI(apiKey, document.getElementById('aiModel').value);
-    showToast('连接成功 ✓','success');
-  } catch(e) {
-    showToast(e.message,'error');
-  }
-}
+
 
 // ===== Team AI =====
 
@@ -404,7 +394,7 @@ export async function runTeamAnalysis() {
   }
   maybeSaveAIKey('tcAiApiKey', 'tcAiRememberKey', 'tcAiProvider');
   const apiKey = tcKeyEl.value.trim();
-  if (!apiKey) { showToast('请先填写 API Key','error'); return; }
+  if (!apiKey && !isTrialMode) { showToast('请先填写 API Key 或开启试用模式','error'); return; }
 
   const prompt = await _buildTeamAnalysisPrompt();
   if (!prompt) return;
@@ -434,7 +424,7 @@ export async function runTeamAnalysisPrecise() {
   }
   maybeSaveAIKey('tcAiApiKey', 'tcAiRememberKey', 'tcAiProvider');
   const apiKey = tcKeyEl.value.trim();
-  if (!apiKey) { showToast('请先填写 API Key','error'); return; }
+  if (!apiKey && !isTrialMode) { showToast('请先填写 API Key 或开启试用模式','error'); return; }
 
   const prompt = await _buildTeamAnalysisPrompt();
   if (!prompt) return;
@@ -493,19 +483,4 @@ export async function runTeamAnalysisPrecise() {
   }
 }
 
-export async function testTeamAIConnection() {
-  const tcKeyEl = document.getElementById('tcAiApiKey');
-  if (!tcKeyEl.value.trim()) {
-    const battleKey = document.getElementById('aiApiKey').value.trim();
-    if (battleKey) tcKeyEl.value = battleKey;
-  }
-  maybeSaveAIKey('tcAiApiKey', 'tcAiRememberKey', 'tcAiProvider');
-  const apiKey = tcKeyEl.value.trim();
-  if (!apiKey) { showToast('请先填写 API Key','error'); return; }
-  try {
-    await testAI(apiKey, document.getElementById('tcAiModel').value);
-    showToast('连接成功 ✓','success');
-  } catch(e) {
-    showToast(e.message,'error');
-  }
-}
+

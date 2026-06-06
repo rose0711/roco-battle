@@ -27,8 +27,8 @@ import {
   setTeamConfigRef as setAiTeamConfigRef,
   setTurnDataRef as setAiTurnDataRef,
   populateModels, onProviderChange, hookProviderSync, loadAIKey,
-  runAIAnalysis, clearAIResult, testAIConnection, runTeamAnalysis, runTeamAnalysisPrecise, testTeamAIConnection,
-  setTrialMode, initTrialMode, toggleTrial
+  runAIAnalysis, clearAIResult, runTeamAnalysis, runTeamAnalysisPrecise,
+  setTrialMode, initTrialMode, toggleTrial, clearSavedAIKeys
 } from './ai-client.js';
 
 // ===== 5. 印记 & 状态 =====
@@ -83,11 +83,10 @@ window.updateOutcomeResult = updateOutcomeResult;
 
 window.runAIAnalysis = runAIAnalysis;
 window.clearAIResult = clearAIResult;
-window.testAIConnection = testAIConnection;
 window.runTeamAnalysis = runTeamAnalysis;
 window.runTeamAnalysisPrecise = runTeamAnalysisPrecise;
-window.testTeamAIConnection = testTeamAIConnection;
 window.toggleTrial = toggleTrial;
+window.clearSavedAIKeys = clearSavedAIKeys;
 window.onProviderChange = onProviderChange;
 window.renderMarksStatus = renderMarksStatus;
 window.updateMsActivePokemon = updateMsActivePokemon;

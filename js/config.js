@@ -6,8 +6,7 @@
 export const PROVIDER_MODELS = {
   dashscope: [
     { value: 'qwen-plus', label: 'qwen-plus' },
-    { value: 'qwen-max', label: 'qwen-max' },
-    { value: 'qwen-turbo', label: 'qwen-turbo' }
+    { value: 'qwen-max', label: 'qwen-max' }
   ],
   deepseek: [
     { value: 'deepseek-v4-flash', label: 'deepseek-v4-flash' },
